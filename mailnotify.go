@@ -2,9 +2,11 @@ package main
 
 import (
     "fmt"
-    "bitbucket.org/kisom/gopush/pushover"
     "os"
+    "log"
     "path/filepath"
+
+    "github.com/gregdel/pushover"
 )
 
 func main() {
@@ -12,16 +14,26 @@ func main() {
         fmt.Printf("usage: %s api_key user_key\n", filepath.Base(os.Args[0]))
         os.Exit(1)
     }
+    app := pushover.New(os.Args[1])
 
-    pushover.Verbose = false;
-    identity := pushover.Authenticate(
-        os.Args[1],
-        os.Args[2],
-    )
+    // Create a new recipient
+    recipient := pushover.NewRecipient(os.Args[2])
 
-    sent := pushover.Notify_titled(identity, os.Getenv("SUBJECT"), os.Getenv("FROM"))
-    if !sent {
-        fmt.Println("[!] notification failed.")
-        os.Exit(1)
+    // Create the message to send
+    message := &pushover.Message{
+    Message:     os.Getenv("SUBJECT"),
+    Title:       os.Getenv("FROM"),
+    URL:         fmt.Sprintf("message:<%v>", os.Getenv("MSGID")),
+    URLTitle:    "Apple Mail",
+    Sound:       pushover.SoundPushover,
+    }
+
+    // Send the message to the recipient
+    response, err := app.SendMessage(message, recipient)
+    if err != nil {
+        log.Panic(err)
+    }
+    if false {
+        log.Printf("pushover resp %v", response)
     }
 }
