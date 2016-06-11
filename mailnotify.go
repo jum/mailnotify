@@ -25,7 +25,6 @@ func main() {
     Title:       os.Getenv("FROM"),
     URL:         fmt.Sprintf("message:<%v>", os.Getenv("MSGID")),
     URLTitle:    "Apple Mail",
-    Sound:       pushover.SoundPushover,
     }
 
     // Send the message to the recipient
